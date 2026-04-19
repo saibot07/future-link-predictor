@@ -16,7 +16,7 @@ def predict_links(graph):
     predictions = []
 
     for node1, node2 in combinations(nodes, 2):
-        if (node1, node2) not in existing_edges:
+        if (node1, node2) not in existing_edges and (node2, node1) not in existing_edges:
             score = len(node1) + len(node2)  # Simple heuristic (replace with AI model later)
             predictions.append({"link": [node1, node2], "score": score})
 
@@ -29,7 +29,15 @@ def main():
     parser.add_argument('--output', required=True, help="Path to save the prediction results (JSON format).")
     args = parser.parse_args()
 
-    graph = load_graph(args.input)
+    try:
+        graph = load_graph(args.input)
+    except FileNotFoundError:
+        print(f"Error: File '{args.input}' not found.")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: File '{args.input}' is not a valid JSON file.")
+        return
+
     predictions = predict_links(graph)
     save_predictions(args.output, predictions)
     print(f"Predictions saved to {args.output}")
