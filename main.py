@@ -38,13 +38,22 @@ def main():
         print(f"Error: File '{args.input}' is not a valid JSON file.")
         return
 
-    if not isinstance(graph, dict) or 'nodes' not in graph or 'edges' not in graph:
-        print("Error: The input graph JSON must contain 'nodes' and 'edges'.")
+    if not isinstance(graph, dict):
+        print("Error: The input graph data must be a JSON object.")
+        return
+    if 'nodes' not in graph or not isinstance(graph['nodes'], list):
+        print("Error: The input graph JSON must contain a 'nodes' list.")
+        return
+    if 'edges' not in graph or not isinstance(graph['edges'], list):
+        print("Error: The input graph JSON must contain an 'edges' list.")
         return
 
-    predictions = predict_links(graph)
-    save_predictions(args.output, predictions)
-    print(f"Predictions saved to {args.output}")
+    try:
+        predictions = predict_links(graph)
+        save_predictions(args.output, predictions)
+        print(f"Predictions saved to {args.output}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main()
