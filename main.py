@@ -11,8 +11,8 @@ def save_predictions(output_path, predictions):
         json.dump(predictions, f, indent=4)
 
 def predict_links(graph):
-    nodes = graph['nodes']
-    existing_edges = set(tuple(sorted(edge)) for edge in graph['edges'])
+    nodes = graph.get('nodes', [])
+    existing_edges = set(tuple(sorted(edge)) for edge in graph.get('edges', []))
     predictions = []
 
     for node1, node2 in combinations(nodes, 2):
@@ -36,6 +36,10 @@ def main():
         return
     except json.JSONDecodeError:
         print(f"Error: File '{args.input}' is not a valid JSON file.")
+        return
+
+    if not isinstance(graph, dict) or 'nodes' not in graph or 'edges' not in graph:
+        print("Error: The input graph JSON must contain 'nodes' and 'edges'.")
         return
 
     predictions = predict_links(graph)
